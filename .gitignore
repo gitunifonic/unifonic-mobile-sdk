@@ -1,0 +1,33 @@
+# Dart/Flutter related
+.dart_tool/
+.pub/
+/build/
+*.iml
+*.metadata
+*.flutter-plugins
+*.flutter-plugins-dependencies
+.vscode/
+config/.env
+# IDE files
+.idea/
+*.code-workspace
+# Generated files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+/build.pub/
+.dart_tool/
+.idea/
+.vscode/
+# macOS related
+.DS_Store
+# Android related
+/build/
+*.apk
+*.ap_
+# iOS related
+*.app/
+# Dependency management
+.pub/
+# Local configuration
+.local/
