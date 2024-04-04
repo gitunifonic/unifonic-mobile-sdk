@@ -5,13 +5,14 @@ import 'package:http/http.dart' as http;
 import '../model/notification_update.dart';
 
 class HttpService {
-  final String _baseUrl = " https://push-notification-api.integration.dev.unifonic.com";//DotEnv().env['BASE_URL']!;
+  final String _baseUrl =
+      "https://push-notification-api.prod.cloud.unifonic.com"; //DotEnv().env['BASE_URL']!;
   final Map<String, String> _headers = {};
 
   HttpService() {
     _headers.addAll({
       'Content-Type': 'application/json',
-      'api_key': ''//DotEnv().env['api_key']!
+      'api_key': '' //DotEnv().env['api_key']!
     });
   }
 
@@ -66,6 +67,5 @@ class HttpService {
     );
 
     return _handleResponse(response);
-
   }
 }
