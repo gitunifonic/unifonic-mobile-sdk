@@ -42,7 +42,7 @@ class NotificationService {
   static RemoteNotification? remoteNotification;
 
 
-  NotificationService(BuildContext context, String userIdentifier) {
+  NotificationService(BuildContext context, String userIdentifier, String accountId, String apiKey) {
     _buildContext = context;
     if (!kIsWeb) {
       _setupFlutterNotifications();
@@ -201,9 +201,7 @@ class NotificationService {
   }
 
   static onSelectNotification(NotificationResponse notificationResponse) async {
-    print("in onSelectNotification");
-    print(_payload.toString());
-
+    print('pppayload ${_payload.toString()}');
 
     if (_payload['targetUrl'] != null) {
       var arguments = {
@@ -214,6 +212,31 @@ class NotificationService {
       //@TODO add notification to local storage from here
       Navigator.of(_buildContext)
           .pushReplacementNamed(_payload['targetUrl'], arguments: arguments);
+    }
+
+    NotificationUpdateModel notificationUpdateModel = NotificationUpdateModel(
+        notificationId: _payload['notificationId'],
+        notificationStatus: "CLICKED",
+        userIdentifier: _userIdentifier
+    );
+
+    httpService.updateStatus(notificationUpdateModel);
+  }
+
+  static onMessageReceived(RemoteMessage message) async {
+    print('payload: ${message.notification}');
+    print('payload data: ${message.data}');
+    print('payload: ${message.category}');
+
+    if (message.data['targetUrl'] != null) {
+      var arguments = {
+        'title': 'test',//message.notification?.title,
+        'body': message.data
+      };
+
+      //@TODO add notification to local storage from here
+      Navigator.of(_buildContext)
+          .pushReplacementNamed( message.data['targetUrl'], arguments: arguments);
     }
 
     NotificationUpdateModel notificationUpdateModel = NotificationUpdateModel(
@@ -273,6 +296,11 @@ class NotificationService {
   _forgroundNotification() {
     FirebaseMessaging.onMessage.listen(
           (message) async {
+
+      if (Platform.isIOS) {
+        onMessageReceived(message);
+      }
+
         if (message.data.containsKey('data')) {
           // Handle data message
           streamCtlr.sink.add(message.data['data']);
