@@ -22,7 +22,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'notification_service.dart';
 
 class NotificationService {
-  static  Map<dynamic, dynamic> _payload = {};
+  static Map<dynamic, dynamic> _payload = {};
 
   static late AndroidNotificationChannel channel;
 
@@ -34,15 +34,16 @@ class NotificationService {
   final titleCtlr = StreamController<String>.broadcast();
   final bodyCtlr = StreamController<String>.broadcast();
 
-  static var _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static var _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
   static final httpService = HttpService();
 
   static var _buildContext;
   static var _userIdentifier;
   static RemoteNotification? remoteNotification;
 
-
-  NotificationService(BuildContext context, String userIdentifier, String accountId, String apiKey) {
+  NotificationService(BuildContext context, String userIdentifier,
+      String accountId, String apiKey) {
     _buildContext = context;
     if (!kIsWeb) {
       _setupFlutterNotifications();
@@ -66,14 +67,13 @@ class NotificationService {
   }
 
   @pragma('vm:entry-point')
-  static Future<void>  _firebaseMessagingBackgroundHandler(
+  static Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     await _setupFlutterNotifications();
   }
 
   Future<Map<String, dynamic>> _registerDevice(
       Map<String, dynamic> deviceInfoRequestDTO) async {
-
     var localToken = await _firebaseMessaging.getToken();
     if (localToken != null) {
       deviceInfoRequestDTO["firebaseToken"] = localToken;
@@ -84,10 +84,8 @@ class NotificationService {
 
   _getCountryFromLatAndLng(var latitude, var longitude) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-          latitude,
-          longitude
-      );
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
 
       Placemark place = placemarks[0];
       return place.country;
@@ -97,17 +95,16 @@ class NotificationService {
   }
 
   void registerDevice(Map<String, dynamic> deviceInfoRequestDTO) async {
-
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
     if (Platform.isAndroid) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceInfoRequestDTO["deviceType"]= androidInfo.brand;
+      deviceInfoRequestDTO["deviceType"] = androidInfo.brand;
       deviceInfoRequestDTO["deviceModel"] = androidInfo.model;
-      deviceInfoRequestDTO["deviceOs"] =  "ANDROID";
+      deviceInfoRequestDTO["deviceOs"] = "ANDROID";
     } else {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceInfoRequestDTO["deviceType"]= "iPhone";
+      deviceInfoRequestDTO["deviceType"] = "iPhone";
       deviceInfoRequestDTO["deviceModel"] = iosInfo.model;
       deviceInfoRequestDTO["deviceOs"] = "IOS";
 
@@ -122,22 +119,21 @@ class NotificationService {
 
     Position? position = await Geolocator.getLastKnownPosition();
     if (position != null) {
-      deviceInfoRequestDTO["latitude"] =   position.latitude;
-      deviceInfoRequestDTO["longitude"] =  position.longitude;
-      deviceInfoRequestDTO["country"] =  "UAE"; //@TODO update
+      deviceInfoRequestDTO["latitude"] = position.latitude;
+      deviceInfoRequestDTO["longitude"] = position.longitude;
+      deviceInfoRequestDTO["country"] = "UAE"; //@TODO update
       //     _getCountryFromLatAndLng(
       //     position.latitude, position.longitude
       // );
     }
 
-
-    deviceInfoRequestDTO["deviceLanguage"]= "US";
+    deviceInfoRequestDTO["deviceLanguage"] = "US";
 
     deviceInfoRequestDTO["deviceTimezone"] = DateTime.now().timeZoneName;
 
     var ipAddress = IpAddress(type: RequestType.json);
     var data = await ipAddress.getIpAddress();
-    deviceInfoRequestDTO["lastIpAddress"] =  data['ip'];
+    deviceInfoRequestDTO["lastIpAddress"] = data['ip'];
 
     _registerDevice(deviceInfoRequestDTO);
     _showEvent();
@@ -201,7 +197,7 @@ class NotificationService {
   }
 
   static onSelectNotification(NotificationResponse notificationResponse) async {
-    print('pppayload ${_payload.toString()}');
+
 
     if (_payload['targetUrl'] != null) {
       var arguments = {
@@ -217,33 +213,28 @@ class NotificationService {
     NotificationUpdateModel notificationUpdateModel = NotificationUpdateModel(
         notificationId: _payload['notificationId'],
         notificationStatus: "CLICKED",
-        userIdentifier: _userIdentifier
-    );
+        userIdentifier: _userIdentifier);
 
     httpService.updateStatus(notificationUpdateModel);
   }
 
   static onMessageReceived(RemoteMessage message) async {
-    print('payload: ${message.notification}');
-    print('payload data: ${message.data}');
-    print('payload: ${message.category}');
-
     if (message.data['targetUrl'] != null) {
       var arguments = {
-        'title': 'test',//message.notification?.title,
-        'body': message.data
+        'title': message.notification?.title,
+        'body': message.data.toString()
       };
 
       //@TODO add notification to local storage from here
-      Navigator.of(_buildContext)
-          .pushReplacementNamed( message.data['targetUrl'], arguments: arguments);
+      Navigator.of(_buildContext).pushReplacementNamed(
+          message.data['targetUrl'],
+          arguments: arguments);
     }
 
     NotificationUpdateModel notificationUpdateModel = NotificationUpdateModel(
         notificationId: _payload['notificationId'],
         notificationStatus: "CLICKED",
-        userIdentifier: _userIdentifier
-    );
+        userIdentifier: _userIdentifier);
 
     httpService.updateStatus(notificationUpdateModel);
   }
@@ -256,7 +247,7 @@ class NotificationService {
       'high_importance_channel', // id
       'High Importance Notifications', // title
       description:
-      'This channel is used for important notifications.', // description
+          'This channel is used for important notifications.', // description
       importance: Importance.high,
     );
 
@@ -268,7 +259,7 @@ class NotificationService {
     /// default FCM channel to enable heads up notifications.
     await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
     /// Update the iOS foreground notification presentation options to allow
@@ -295,11 +286,10 @@ class NotificationService {
 
   _forgroundNotification() {
     FirebaseMessaging.onMessage.listen(
-          (message) async {
-
-      if (Platform.isIOS) {
-        onMessageReceived(message);
-      }
+      (message) async {
+        if (Platform.isIOS) {
+          onMessageReceived(message);
+        }
 
         if (message.data.containsKey('data')) {
           // Handle data message
@@ -318,7 +308,7 @@ class NotificationService {
 
   _backgroundNotification() {
     FirebaseMessaging.onMessageOpenedApp.listen(
-          (message) async {
+      (message) async {
         if (message.data.containsKey('data')) {
           // Handle data message
           streamCtlr.sink.add(message.data['data']);
@@ -336,7 +326,7 @@ class NotificationService {
 
   _terminateNotification() async {
     RemoteMessage? initialMessage =
-    await FirebaseMessaging.instance.getInitialMessage();
+        await FirebaseMessaging.instance.getInitialMessage();
 
     if (initialMessage != null) {
       if (initialMessage.data.containsKey('data')) {
@@ -352,6 +342,5 @@ class NotificationService {
       bodyCtlr.sink.add(initialMessage.notification!.body!);
     }
   }
-
-
 }
+
