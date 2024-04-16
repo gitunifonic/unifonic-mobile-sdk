@@ -6,8 +6,8 @@ import '../model/notification_update.dart';
 
 class HttpService {
   final String _baseUrl =
-      //"https://8ef1-178-220-181-108.ngrok-free.app"; //DotEnv().env['BASE_URL']!;
-      "http://push-notification-api.prod.cloud.unifonic.com";
+      // "https://8ef1-178-220-181-108.ngrok-free.app"; //DotEnv().env['BASE_URL']!;
+      "https://push-notification-api.prod.cloud.unifonic.com";
   final Map<String, String> _headers = {};
 
   HttpService() {
