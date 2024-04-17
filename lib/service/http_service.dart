@@ -5,16 +5,12 @@ import 'package:http/http.dart' as http;
 import '../model/notification_update.dart';
 
 class HttpService {
-  final String _baseUrl =
-      // "https://8ef1-178-220-181-108.ngrok-free.app"; //DotEnv().env['BASE_URL']!;
+  final String _baseUrl = //"https://8ef1-178-220-181-108.ngrok-free.app";
       "https://push-notification-api.prod.cloud.unifonic.com";
   final Map<String, String> _headers = {};
 
   HttpService() {
-    _headers.addAll({
-      'Content-Type': 'application/json',
-      'api_key': '' //DotEnv().env['api_key']!
-    });
+    _headers.addAll({'Content-Type': 'application/json', 'api_key': ''});
   }
 
   Map<String, dynamic> _handleResponse(http.Response response) {
@@ -30,6 +26,7 @@ class HttpService {
   }
 
   registerDevice(Map<String, dynamic> deviceInfoRequestDTO) async {
+    print('+++ url base: $_baseUrl +++');
     final response = await http.post(Uri.parse('$_baseUrl/api/v1/device-info/'),
         body: json.encode(deviceInfoRequestDTO), headers: _headers);
 
@@ -57,9 +54,10 @@ class HttpService {
     return _handleResponse(response);
   }
 
-  updateStatus(NotificationUpdateModel notificationUpdateModel) async {
+  updateStatus(
+      NotificationUpdateModel notificationUpdateModel, String accountId) async {
+    print('+++ status update executed +++ $accountId');
     // @TODO get accountId from env variables
-    String accountId = '4fb25f62-d908-40f5-a932-6e40870d9907';
     final response = await http.patch(
       Uri.parse(
           "$_baseUrl/api/v1/notification/update-status?accountId=$accountId"),

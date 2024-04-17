@@ -40,11 +40,16 @@ class NotificationService {
 
   static var _buildContext;
   static var _userIdentifier;
+  static var _accountId;
+
   static RemoteNotification? remoteNotification;
 
   NotificationService(BuildContext context, String userIdentifier,
       String accountId, String apiKey) {
     _buildContext = context;
+    _userIdentifier = userIdentifier;
+    _accountId = accountId;
+
     if (!kIsWeb) {
       _setupFlutterNotifications();
     }
@@ -197,8 +202,6 @@ class NotificationService {
   }
 
   static onSelectNotification(NotificationResponse notificationResponse) async {
-
-
     if (_payload['targetUrl'] != null) {
       var arguments = {
         'title': remoteNotification?.title,
@@ -215,7 +218,7 @@ class NotificationService {
         notificationStatus: "CLICKED",
         userIdentifier: _userIdentifier);
 
-    httpService.updateStatus(notificationUpdateModel);
+    httpService.updateStatus(notificationUpdateModel, _accountId);
   }
 
   static onMessageReceived(RemoteMessage message) async {
@@ -236,7 +239,7 @@ class NotificationService {
         notificationStatus: "CLICKED",
         userIdentifier: _userIdentifier);
 
-    httpService.updateStatus(notificationUpdateModel);
+    httpService.updateStatus(notificationUpdateModel, _accountId);
   }
 
   static Future<void> _setupFlutterNotifications() async {
@@ -343,4 +346,3 @@ class NotificationService {
     }
   }
 }
-
