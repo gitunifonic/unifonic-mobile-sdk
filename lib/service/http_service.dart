@@ -7,6 +7,7 @@ import '../model/notification_update.dart';
 class HttpService {
   final String _baseUrl = //"https://8ef1-178-220-181-108.ngrok-free.app";
       "https://push-notification-api.prod.cloud.unifonic.com";
+
   final Map<String, String> _headers = {};
 
   HttpService() {
@@ -62,6 +63,15 @@ class HttpService {
       Uri.parse(
           "$_baseUrl/api/v1/notification/update-status?accountId=$accountId"),
       body: jsonEncode(notificationUpdateModel),
+      headers: _headers,
+    );
+
+    return _handleResponse(response);
+  }
+
+  Future<Map<String, dynamic>> firebaseConfig(String deviceType) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/api/v1/firebase/$deviceType'),
       headers: _headers,
     );
 

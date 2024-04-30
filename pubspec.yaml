@@ -108,4 +108,4 @@ flutter:
 false_secrets:
   - /android/app/google-services.json
   - /ios/Runner/GoogleService-Info.plist
-  - /lib/firebase_options.dart
+  - /lib/configure.dart
